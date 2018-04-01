@@ -64,28 +64,32 @@ def selectfrompopulation(fitness, samplesize):
 
 def createchild(parent1, parent2, weightlimit):
     child = {}
-    parents = []
+    parents = {}
     for itemparent1 in parent1:
-        parents.append(parent1[itemparent1])
+        parents[itemparent1] = parent1[itemparent1]
     for itemparent2 in parent2:
-        parents.append(parent2[itemparent2])
+        parents[itemparent2] = parent2[itemparent2]
     x = 0
+    keylist = list(parents)
     while x <= weightlimit:
         if len(parents) == 0:
             break
-        index = int(random.random() * len(parents))
-        if parents[index][1] + x > weightlimit:
-            del parents[index]
+        index = int(random.random() * len(keylist))
+        key = keylist[index]
+        if parents[key][1] + x > weightlimit:
+            del parents[key]
+            del keylist[index]
             continue
-        child[index] = parents[index]
-        x = x + parents[index][1]
-        del parents[index]
-        print(parents)
+        child[key] = parents[key]
+        x = x + parents[key][1]
+        del parents[key]
+        del keylist[index]
     return child
 
 def createchildren(breeders, number_of_children, weightlimit):
     nextpopulation = []
     x = 1
+    nextpopulation.append(breeders[0])
     for i in breeders:
         for j in range(number_of_children):
             nextpopulation.append(createchild(i,breeders[len(breeders)-x], weightlimit))
@@ -116,18 +120,18 @@ def mutatepopulation(population, chanceofmutation):
         x = x + 1
     return population
 
-populationsize = 10
-itemsavailable = 10
+populationsize = 20
+itemsavailable = 50
 weightlimit = 50
 
 pop = generatepopulation(populationsize, itemsavailable, weightlimit)
-for i in range(0, 2):
+for i in range(0, 15):
     fpop = fitness(pop)
     print('\n-----Generation' + str(i + 1) + '-----')
     print(fpop[0])
     popselect = selectfrompopulation(fpop, len(fpop))
     children = createchildren(popselect, 1, weightlimit)
-    pop = mutatepopulation(children, 5)
+    pop = mutatepopulation(children, 30)
 
 
         
